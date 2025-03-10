@@ -35,12 +35,15 @@
       font-size: 1em;
       border: none;
       border-radius: 5px;
-      background-color: #007bff;
       color: #fff;
       cursor: pointer;
     }
+    .options button:nth-child(1) { background-color: #007bff; } /* Blue */
+    .options button:nth-child(2) { background-color: #28a745; } /* Green */
+    .options button:nth-child(3) { background-color: #dc3545; } /* Red */
+    .options button:nth-child(4) { background-color: #ffc107; } /* Yellow */
     .options button:hover {
-      background-color: #0056b3;
+      opacity: 0.9;
     }
     .score {
       font-size: 1.5em;
@@ -65,73 +68,136 @@
     .end-screen button:hover {
       background-color: #218838;
     }
+    .homepage {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .homepage button {
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
+    }
+    .homepage button:nth-child(1) { background-color: #007bff; } /* Blue */
+    .homepage button:nth-child(2) { background-color: #28a745; } /* Green */
+    .homepage button:nth-child(3) { background-color: #dc3545; } /* Red */
+    .homepage button:hover {
+      opacity: 0.9;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Social Credit Quiz</h1>
-    <div class="question" id="question"></div>
-    <div class="options" id="options"></div>
-    <div class="score">
-      Social Credit Score: <span id="score">0</span>
+    <div class="homepage" id="homepage">
+      <button onclick="loadQuestionSet(0)">Question Set 1</button>
+      <button onclick="loadQuestionSet(1)">Question Set 2</button>
+      <button onclick="loadQuestionSet(2)">Question Set 3</button>
     </div>
-    <div class="end-screen" id="endScreen">
-      <h2>Quiz Over!</h2>
-      <p>Your final score is <span id="finalScore">0</span>.</p>
-      <button onclick="resetQuiz()">Restart Quiz</button>
+    <div id="quiz" style="display: none;">
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div class="score">
+        Social Credit Score: <span id="score">0</span>
+      </div>
+      <div class="end-screen" id="endScreen">
+        <h2>Quiz Over!</h2>
+        <p>Your final score is <span id="finalScore">0</span>.</p>
+        <button onclick="resetQuiz()">Restart Quiz</button>
+      </div>
     </div>
   </div>
 
   <script>
-    // Questions and answers
-    const questions = [
-      {
-        question: "Is littering in public places good?",
-        options: ["No", "Maybe", "Yes", "Only if you have a permit"],
-        correct: 3, // Index of the correct answer
-      },
-      {
-        question: "Should you pass red lights?",
-        options: ["Green", "Only on tuesdays", "Only in the city", "Only on the moon"],
-        correct: 1,
-      },
-      {
-        question: "Should you cheat on exams?",
-        options: ["If you forgot to study", "If you purchased a 40 dollar calculator and loaded it with all of the answers", "Nope", "If you're desperate"],
-        correct: 1,
-      },
-      {
-        question: "Should you report UFO's to authorities?",
-        options: ["No", "First shoot down", "NEVER", "Only if you are in possetion of a boing-747"],
-        correct: 1,
-      },
-      {
-        question: "Should you shoplift?",
-        options: ["If you are over 18", "No?", "Only if it's cheap", "Only at CVS"],
-        correct: 1,
-      },
-      // Add more questions here...
+    // Question sets
+    const questionSets = [
+      [
+        {
+          question: "Is littering in public places good?",
+          options: ["No", "Maybe", "Yes", "Only if you have a permit"],
+          correct: 3, // Index of the correct answer
+        },
+        {
+          question: "Should you pass red lights?",
+          options: ["Green", "Only on tuesdays", "Only in the city", "Only on the moon"],
+          correct: 1,
+        },
+        {
+          question: "Should you cheat on exams?",
+          options: ["If you forgot to study", "If you purchased a 40 dollar calculator and loaded it with all of the answers", "Nope", "If you're desperate"],
+          correct: 1,
+        },
+        {
+          question: "Should you report UFO's to authorities?",
+          options: ["No", "First shoot down", "NEVER", "Only if you are in possetion of a boing-747"],
+          correct: 1,
+        },
+        {
+          question: "Should you shoplift?",
+          options: ["If you are over 18", "No?", "Only if it's cheap", "Only at CVS"],
+          correct: 1,
+        },
+      ],
+      // Add more question sets here...
+      [
+        {
+          question: "Is it okay to jaywalk?",
+          options: ["Always", "Never", "Only if no cars are around", "Only on weekends"],
+          correct: 2,
+        },
+        {
+          question: "Should you pay for public transportation?",
+          options: ["Yes", "No", "Only if the driver is nice", "Only on rainy days"],
+          correct: 0,
+        },
+      ],
+      [
+        {
+          question: "Is it fine to skip voting?",
+          options: ["Yes", "No", "Only if you're busy", "Only in local elections"],
+          correct: 1,
+        },
+        {
+          question: "Should you respect your neighbors' privacy?",
+          options: ["Yes", "No", "Only if they respect yours", "Only on weekdays"],
+          correct: 0,
+        },
+      ],
     ];
 
     let currentQuestionIndex = 0;
     let score = 0;
+    let currentQuestionSet = [];
     const scoreElement = document.getElementById('score');
     const questionElement = document.getElementById('question');
     const optionsElement = document.getElementById('options');
     const endScreen = document.getElementById('endScreen');
     const finalScoreElement = document.getElementById('finalScore');
+    const homepage = document.getElementById('homepage');
+    const quiz = document.getElementById('quiz');
+
+    // Load a question set
+    function loadQuestionSet(setIndex) {
+      currentQuestionSet = questionSets[setIndex];
+      homepage.style.display = "none";
+      quiz.style.display = "block";
+      resetQuiz();
+    }
 
     // Shuffle questions
     function shuffleQuestions() {
-      for (let i = questions.length - 1; i > 0; i--) {
+      for (let i = currentQuestionSet.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [questions[i], questions[j]] = [questions[j], questions[i]];
+        [currentQuestionSet[i], currentQuestionSet[j]] = [currentQuestionSet[j], currentQuestionSet[i]];
       }
     }
 
     // Display question
     function displayQuestion() {
-      const currentQuestion = questions[currentQuestionIndex];
+      const currentQuestion = currentQuestionSet[currentQuestionIndex];
       questionElement.textContent = currentQuestion.question;
       optionsElement.innerHTML = currentQuestion.options
         .map(
@@ -144,7 +210,7 @@
 
     // Check answer
     function checkAnswer(answerIndex) {
-      const currentQuestion = questions[currentQuestionIndex];
+      const currentQuestion = currentQuestionSet[currentQuestionIndex];
       if (answerIndex === currentQuestion.correct) {
         score += 5;
       } else {
@@ -166,7 +232,7 @@
     // Move to next question
     function nextQuestion() {
       currentQuestionIndex++;
-      if (currentQuestionIndex >= questions.length) {
+      if (currentQuestionIndex >= currentQuestionSet.length) {
         showEndScreen();
       } else {
         displayQuestion();
@@ -192,10 +258,6 @@
       shuffleQuestions();
       displayQuestion();
     }
-
-    // Initialize quiz
-    shuffleQuestions();
-    displayQuestion();
   </script>
 </body>
 </html>
