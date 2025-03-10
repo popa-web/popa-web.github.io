@@ -1,17 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Social Credit</title>
-    <link rel="stylesheet" href="./style.css">
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
-  </head>
-  <body>
-    <main>
-        <h1>Welcome to My Website</h1>  
-    </main>
-    <script src="index.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Social Credit Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #444;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .question {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+    }
+    .options button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+    }
+    .options button:hover {
+      background-color: #0056b3;
+    }
+    .score {
+      font-size: 1.5em;
+      margin-top: 20px;
+    }
+    .negative {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Social Credit Quiz</h1>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="score">
+      Social Credit Score: <span id="score">0</span>
+    </div>
+  </div>
+
+  <script>
+    // Questions and answers
+    const questions = [
+      { question: "Is littering in public places acceptable?", correct: false },
+      { question: "Should you always respect traffic rules?", correct: true },
+      { question: "Is it okay to cheat on exams?", correct: false },
+      { question: "Should you report suspicious activities to authorities?", correct: true },
+      { question: "Is it fine to vandalize public property?", correct: false },
+      { question: "Should you help elderly people cross the street?", correct: true },
+      { question: "Is it acceptable to spread fake news?", correct: false },
+      { question: "Should you pay taxes on time?", correct: true },
+      { question: "Is it okay to bribe officials?", correct: false },
+      { question: "Should you follow public health guidelines?", correct: true },
+      // Add 90 more questions here...
+      // Example:
+      { question: "Is it good to volunteer in your community?", correct: true },
+      { question: "Should you avoid paying for public transportation?", correct: false },
+      { question: "Is it acceptable to skip voting in elections?", correct: false },
+      { question: "Should you respect your neighbors' privacy?", correct: true },
+      { question: "Is it okay to use your phone loudly in public?", correct: false },
+      { question: "Should you recycle waste properly?", correct: true },
+      { question: "Is it fine to ignore environmental conservation efforts?", correct: false },
+      { question: "Should you be honest in your business dealings?", correct: true },
+      { question: "Is it acceptable to discriminate against others?", correct: false },
+      { question: "Should you support local businesses?", correct: true },
+      // Continue adding questions...
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    const scoreElement = document.getElementById('score');
+    const questionElement = document.getElementById('question');
+    const optionsElement = document.getElementById('options');
+
+    // Shuffle questions
+    function shuffleQuestions() {
+      for (let i = questions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [questions[i], questions[j]] = [questions[j], questions[i]];
+      }
+    }
+
+    // Display question
+    function displayQuestion() {
+      const currentQuestion = questions[currentQuestionIndex];
+      questionElement.textContent = currentQuestion.question;
+      optionsElement.innerHTML = `
+        <button onclick="checkAnswer(true)">True</button>
+        <button onclick="checkAnswer(false)">False</button>
+      `;
+    }
+
+    // Check answer
+    function checkAnswer(answer) {
+      const currentQuestion = questions[currentQuestionIndex];
+      if (answer === currentQuestion.correct) {
+        score += 1;
+      } else {
+        score -= 1;
+      }
+      scoreElement.textContent = score;
+      if (score <= -20) {
+        playSoundEffect();
+      }
+      nextQuestion();
+    }
+
+    // Play sound effect
+    function playSoundEffect() {
+      const audio = new Audio('https://www.myinstants.com/media/sounds/fail-trombone-01.mp3');
+      audio.play();
+    }
+
+    // Move to next question
+    function nextQuestion() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex >= questions.length) {
+        alert("Quiz over! Your final score is " + score);
+        resetQuiz();
+      } else {
+        displayQuestion();
+      }
+    }
+
+    // Reset quiz
+    function resetQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      scoreElement.textContent = score;
+      shuffleQuestions();
+      displayQuestion();
+    }
+
+    // Initialize quiz
+    shuffleQuestions();
+    displayQuestion();
+  </script>
+</body>
 </html>
