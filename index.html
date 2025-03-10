@@ -49,6 +49,22 @@
     .negative {
       color: red;
     }
+    .end-screen {
+      display: none;
+      margin-top: 20px;
+    }
+    .end-screen button {
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      background-color: #28a745;
+      color: #fff;
+      cursor: pointer;
+    }
+    .end-screen button:hover {
+      background-color: #218838;
+    }
   </style>
 </head>
 <body>
@@ -59,34 +75,42 @@
     <div class="score">
       Social Credit Score: <span id="score">0</span>
     </div>
+    <div class="end-screen" id="endScreen">
+      <h2>Quiz Over!</h2>
+      <p>Your final score is <span id="finalScore">0</span>.</p>
+      <button onclick="resetQuiz()">Restart Quiz</button>
+    </div>
   </div>
 
   <script>
     // Questions and answers
     const questions = [
-      { question: "Is littering in public places acceptable?", correct: true },
-      { question: "Should you always respect traffic rules?", correct: false },
-      { question: "Is it okay to cheat on exams?", correct: true },
-      { question: "Should you report suspicious activities to authorities?", correct: false },
-      { question: "Is it fine to vandalize public property?", correct: true },
-      { question: "Should you help elderly people cross the street?", correct: false },
-      { question: "Is it acceptable to spread fake news?", correct: true },
-      { question: "Should you pay taxes on time?", correct: false },
-      { question: "Is it okay to bribe officials?", correct: true },
-      { question: "Should you follow public health guidelines?", correct: false },
-      // Add 90 more questions here...
-      // Example:
-      { question: "Is it good to volunteer in your community?", correct: false },
-      { question: "Should you avoid paying for public transportation?", correct: true },
-      { question: "Is it acceptable to skip voting in elections?", correct: true },
-      { question: "Should you respect your neighbors' privacy?", correct: false },
-      { question: "Is it okay to use your phone loudly in public?", correct: true },
-      { question: "Should you recycle waste properly?", correct: false },
-      { question: "Is it fine to ignore environmental conservation efforts?", correct: true },
-      { question: "Should you be honest in your business dealings?", correct: false },
-      { question: "Is it acceptable to discriminate against others?", correct: true },
-      { question: "Should you support local businesses?", correct: false },
-      // Continue adding questions...
+      {
+        question: "Is littering in public places acceptable?",
+        options: ["Yes", "No", "Sometimes", "Only on weekends"],
+        correct: 1, // Index of the correct answer
+      },
+      {
+        question: "Should you always respect traffic rules?",
+        options: ["Yes", "No", "Only in the city", "Only on highways"],
+        correct: 0,
+      },
+      {
+        question: "Is it okay to cheat on exams?",
+        options: ["Yes", "No", "Only if you're desperate", "Only in math"],
+        correct: 1,
+      },
+      {
+        question: "Should you report suspicious activities to authorities?",
+        options: ["Yes", "No", "Only if it's serious", "Only if you know them"],
+        correct: 0,
+      },
+      {
+        question: "Is it fine to vandalize public property?",
+        options: ["Yes", "No", "Only if it's art", "Only at night"],
+        correct: 1,
+      },
+      // Add more questions here...
     ];
 
     let currentQuestionIndex = 0;
@@ -94,6 +118,8 @@
     const scoreElement = document.getElementById('score');
     const questionElement = document.getElementById('question');
     const optionsElement = document.getElementById('options');
+    const endScreen = document.getElementById('endScreen');
+    const finalScoreElement = document.getElementById('finalScore');
 
     // Shuffle questions
     function shuffleQuestions() {
@@ -107,16 +133,19 @@
     function displayQuestion() {
       const currentQuestion = questions[currentQuestionIndex];
       questionElement.textContent = currentQuestion.question;
-      optionsElement.innerHTML = `
-        <button onclick="checkAnswer(true)">True</button>
-        <button onclick="checkAnswer(false)">False</button>
-      `;
+      optionsElement.innerHTML = currentQuestion.options
+        .map(
+          (option, index) => `
+        <button onclick="checkAnswer(${index})">${option}</button>
+      `
+        )
+        .join("");
     }
 
     // Check answer
-    function checkAnswer(answer) {
+    function checkAnswer(answerIndex) {
       const currentQuestion = questions[currentQuestionIndex];
-      if (answer === currentQuestion.correct) {
+      if (answerIndex === currentQuestion.correct) {
         score += 5;
       } else {
         score -= 15;
@@ -130,7 +159,7 @@
 
     // Play sound effect
     function playSoundEffect() {
-      const audio = new Audio('https://www.myinstants.com/instant/999-social-credit-siren-82729');
+      const audio = new Audio('sf.mp3');
       audio.play();
     }
 
@@ -138,11 +167,18 @@
     function nextQuestion() {
       currentQuestionIndex++;
       if (currentQuestionIndex >= questions.length) {
-        alert("Quiz over! Your final score is " + score);
-        resetQuiz();
+        showEndScreen();
       } else {
         displayQuestion();
       }
+    }
+
+    // Show end screen
+    function showEndScreen() {
+      questionElement.style.display = "none";
+      optionsElement.style.display = "none";
+      endScreen.style.display = "block";
+      finalScoreElement.textContent = score;
     }
 
     // Reset quiz
@@ -150,6 +186,9 @@
       currentQuestionIndex = 0;
       score = 0;
       scoreElement.textContent = score;
+      questionElement.style.display = "block";
+      optionsElement.style.display = "block";
+      endScreen.style.display = "none";
       shuffleQuestions();
       displayQuestion();
     }
