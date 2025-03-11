@@ -93,9 +93,8 @@
   <div class="container">
     <h1>Social Credit Quiz</h1>
     <div class="homepage" id="homepage">
-      <button onclick="loadQuestionSet(0)">Question Set 1</button>
-      <button onclick="loadQuestionSet(1)">Question Set 2</button>
-      <button onclick="loadQuestionSet(2)">Question Set 3</button>
+      <button onclick="loadQuestionSet(0)">General Question</button>
+      <button onclick="loadQuestionSet(1)">Technology Question</button>
     </div>
     <div id="quiz" style="display: none;">
       <div class="question" id="question"></div>
@@ -118,52 +117,39 @@
         {
           question: "Is littering in public places good?",
           options: ["No", "Maybe", "Yes", "Only if you have a permit"],
-          correct: 3, // Index of the correct answer
+          weights: [5, -5, -15, -10], // Points for each option
         },
         {
           question: "Should you pass red lights?",
           options: ["Green", "Only on tuesdays", "Only in the city", "Only on the moon"],
-          correct: 1,
+          weights: [-10, -5, -15, 5], // Points for each option
         },
         {
           question: "Should you cheat on exams?",
           options: ["If you forgot to study", "If you purchased a 40 dollar calculator and loaded it with all of the answers", "Nope", "If you're desperate"],
-          correct: 1,
+          weights: [-10, -20, 10, -5], // Points for each option
         },
         {
           question: "Should you report UFO's to authorities?",
           options: ["No", "First shoot down", "NEVER", "Only if you are in possetion of a boing-747"],
-          correct: 1,
+          weights: [-5, -15, -20, 10], // Points for each option
         },
         {
           question: "Should you shoplift?",
           options: ["If you are over 18", "No?", "Only if it's cheap", "Only at CVS"],
-          correct: 1,
-        },
-      ],
-      // Add more question sets here...
-      [
-        {
-          question: "Is it okay to jaywalk?",
-          options: ["Always", "Never", "Only if no cars are around", "Only on weekends"],
-          correct: 2,
-        },
-        {
-          question: "Should you pay for public transportation?",
-          options: ["Yes", "No", "Only if the driver is nice", "Only on rainy days"],
-          correct: 0,
+          weights: [-20, 10, -15, -10], // Points for each option
         },
       ],
       [
         {
-          question: "Is it fine to skip voting?",
-          options: ["Yes", "No", "Only if you're busy", "Only in local elections"],
-          correct: 1,
+          question: "Which AI chatbot is the best?",
+          options: ["ChatGPT", "Deepseek", "Copilot", "Gemini"],
+          weights: [5, 10, -5, -10], // Points for each option
         },
         {
           question: "Should you respect your neighbors' privacy?",
           options: ["Yes", "No", "Only if they respect yours", "Only on weekdays"],
-          correct: 0,
+          weights: [10, -20, 5, -10], // Points for each option
         },
       ],
     ];
@@ -211,11 +197,8 @@
     // Check answer
     function checkAnswer(answerIndex) {
       const currentQuestion = currentQuestionSet[currentQuestionIndex];
-      if (answerIndex === currentQuestion.correct) {
-        score += 5;
-      } else {
-        score -= 15;
-      }
+      const weight = currentQuestion.weights[answerIndex]; // Get the weight for the selected answer
+      score += weight; // Update the score
       scoreElement.textContent = score;
       if (score <= -20) {
         playSoundEffect();
